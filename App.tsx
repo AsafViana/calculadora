@@ -1,21 +1,19 @@
-import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context'
 import React from 'react'
+import Routes from './src/routes'
+import { NavigationContainer } from '@react-navigation/native'
+import { StatusBar } from 'react-native'
+import { NativeBaseProvider } from 'native-base'
+import { LogBox } from 'react-native'
 
 export default function App() {
+	LogBox.ignoreAllLogs()
 	return (
-		<View style={styles.container}>
-			<Text>Open up App.js to start working on your app!</Text>
-			<StatusBar style="auto" />
-		</View>
+				<NavigationContainer>
+					<NativeBaseProvider>
+						<Routes />
+						<StatusBar barStyle='light-content' backgroundColor={'#171717'}/>
+					</NativeBaseProvider>
+				</NavigationContainer>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#fff',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-})
