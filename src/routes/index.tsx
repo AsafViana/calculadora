@@ -1,6 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack'
-import { lazy } from 'react'
 import Calculadora from '../view/Calculadora'
+import Chat from '../view/Chat'
+import Teste from '../view/Teste'
+import { lazy } from 'react'
 
 const { Screen, Navigator } = createStackNavigator()
 
@@ -38,6 +40,8 @@ export default function MyStack() {
 	return (
 		<Navigator screenOptions={CardOptions}>
 			<Screen name="Calculadora" component={Calculadora} />
+			<Screen name="Chat" component={Chat} />
+			<Screen name="Teste" component={Teste} />
 		</Navigator>
 	)
 }

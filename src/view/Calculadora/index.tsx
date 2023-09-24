@@ -1,12 +1,17 @@
 import { Center, Text, Box, Button, VStack, HStack } from 'native-base'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import BotaoCalculadora from '../../component/BotaoCalculadora'
 import { AntDesign, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { onValue, ref, database } from '../../service/firebaseConfig'
 
 export default function index(props) {
 	const {} = props
+	const navigation = useNavigation()
 	const [Resultado, setResultado] = useState('')
 	const [Operação, setOperação] = useState('0')
+	const [SenhaAsaf, setSenhaAsaf] = useState()
+	const [SenhaLuisa, setSenhaLuisa] = useState()
 
 	const handle_onPress = (botao) => {
 		if (botao === 'C') {
@@ -15,19 +20,36 @@ export default function index(props) {
 		} else if (botao === 'bs') {
 			setOperação(Operação.slice(0, -1))
 		} else if (botao === '=') {
-			setResultado(eval(Operação))
+			if (Operação === SenhaAsaf) {
+				navigation.navigate('Chat', {usuario: 'asaf'})
+
+			}else if (Operação === SenhaLuisa){
+				navigation.navigate('Chat', { usuario: 'luisa' })
+			}
+			else {
+				setResultado(eval(Operação))
+			}
 		} else {
 
 			if (Operação !== '0') {
 				setOperação(Operação + botao)
-			}else if (Operação === '2004+2007'){
-				console.log('teste')
 			}
 			else {
 				setOperação(botao)
 			}
 		}
 	}
+
+	const get_senha = useCallback(() => {
+		onValue(ref(database, 'calculadora/senhas/chat'), (val) => {
+			const obj = val.val()
+			setSenhaAsaf(obj.asaf)
+			setSenhaLuisa(obj.luisa)
+		})
+	}, [SenhaAsaf, SenhaLuisa])
+
+	useEffect(get_senha, [SenhaAsaf, SenhaLuisa])
+
 
 	return (
 		<Box flex={1} background={'muted.900'} safeArea>
