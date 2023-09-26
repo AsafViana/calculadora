@@ -1,11 +1,12 @@
 import { Center, Text } from 'native-base'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
 import { Platform } from 'react-native'
 import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { set, ref, database, onValue } from '../../service/firebaseConfig'
+import { set, ref, database, onValue, collection, firestore, setDoc, doc } from '../../service/firebaseConfig'
 import { GiftedChat } from 'react-native-gifted-chat'
 import {Perfil} from '../../model'
+import { onSnapshot } from 'firebase/firestore'
 
 export default function index(props) {
 	const {} = props
@@ -13,37 +14,29 @@ export default function index(props) {
 	const parametros = route.params
 	const navigation = useNavigation()
 	const [messages, setMessages] = useState([])
-	const [Perfis, setPerfis] = useState({})
 
+	useLayoutEffect(() => {
 
-	const getPerfil = useCallback(() => {
-		onValue(ref(database, 'calculadora/perfil'), val => {
-			const obj: Perfil = val.val()
-			setPerfis(obj)
-			console.log(obj)
-			console.log(parametros.usuario)
-
+		onSnapshot(doc(firestore, 'chats'), doc => {
+			console.log(doc.data())
 		})
-	}, [Perfis, parametros])
 
-	useEffect(() => {
-		getPerfil()
-		setMessages([
-			{
-				_id: 1,
-				text: 'Hello developer',
-				createdAt: new Date(),
-				user: {
-					_id: 2,
-					name: 'React Native',
-					avatar: 'https://i.ibb.co/7gxNZzd/0987f8c37d654a2267833ca048b3e8ea.jpg',
-				},
-			},
-		])
 	}, [])
 
 	const onSend = useCallback((messages = []) => {
 		setMessages((previousMessages) => GiftedChat.append(previousMessages, messages))
+		const {
+			_id,
+			createdAt,
+			test,
+			user
+		}=messages[0]
+		setDoc(doc(firestore,'chats'), {
+			_id,
+			createdAt,
+			test,
+			user,
+		})
 	}, [])
 
 	return (

@@ -4,6 +4,7 @@ import BotaoCalculadora from '../../component/BotaoCalculadora'
 import { AntDesign, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { onValue, ref, database } from '../../service/firebaseConfig'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function index(props) {
 	const {} = props
@@ -21,26 +22,22 @@ export default function index(props) {
 			setOperação(Operação.slice(0, -1))
 		} else if (botao === '=') {
 			if (Operação === SenhaAsaf) {
-				navigation.navigate('Chat', {usuario: 'asaf'})
-
-			}else if (Operação === SenhaLuisa){
+				navigation.navigate('Chat', { usuario: 'asaf' })
+			} else if (Operação === SenhaLuisa) {
 				navigation.navigate('Chat', { usuario: 'luisa' })
-			}
-			else {
+			} else {
 				setResultado(eval(Operação))
 			}
 		} else {
-
 			if (Operação !== '0') {
 				setOperação(Operação + botao)
-			}
-			else {
+			} else {
 				setOperação(botao)
 			}
 		}
 	}
 
-	const get_senha = useCallback(() => {
+	const get_dados = useCallback(() => {
 		onValue(ref(database, 'calculadora/senhas/chat'), (val) => {
 			const obj = val.val()
 			setSenhaAsaf(obj.asaf)
@@ -48,8 +45,7 @@ export default function index(props) {
 		})
 	}, [SenhaAsaf, SenhaLuisa])
 
-	useEffect(get_senha, [SenhaAsaf, SenhaLuisa])
-
+	useEffect(get_dados, [SenhaAsaf, SenhaLuisa])
 
 	return (
 		<Box flex={1} background={'muted.900'} safeArea>
@@ -83,7 +79,6 @@ export default function index(props) {
 					<BotaoCalculadora value="6" background="muted.800" color="green.500" onPress={() => handle_onPress('6')} />
 
 					<BotaoCalculadora background="muted.800" color="muted.50" icon={<AntDesign name="minus" size={30} color="#fafaf9" />} onPress={() => handle_onPress('-')} />
-
 				</HStack>
 				<HStack space={'2'} justifyContent={'center'} alignContent={'center'}>
 					<BotaoCalculadora value="1" background="muted.800" color="green.500" onPress={() => handle_onPress('1')} />
@@ -93,7 +88,6 @@ export default function index(props) {
 					<BotaoCalculadora value="3" background="muted.800" color="green.500" onPress={() => handle_onPress('3')} />
 
 					<BotaoCalculadora background="muted.800" color="muted.50" icon={<Entypo name="plus" size={40} color="#fafaf9" />} onPress={() => handle_onPress('+')} />
-
 				</HStack>
 				<HStack space={'2'} justifyContent={'center'} alignContent={'center'}>
 					<BotaoCalculadora value="+/-" background="muted.800" color="green.500" />
