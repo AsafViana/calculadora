@@ -1,28 +1,87 @@
-import { Center, Text } from 'native-base'
-import React, { useState, useEffect, useCallback } from 'react'
-import { Platform } from 'react-native'
+import React, { useState } from 'react'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 
-import { set, ref, database } from '../../service/firebaseConfig'
-//import {color} from '../../../env.json'
+export default function App() {
+	const [input, setInput] = useState('')
+	const [output, setOutput] = useState('')
 
-export default function index(props) {
-	const {} = props
+	const handleButtonPress = (value) => {
+		if (value === '=') {
+			try {
+				setOutput(eval(input).toString())
+			} catch (error) {
+				setOutput('Erro')
+			}
+		} else if (value === 'C') {
+			setInput('')
+			setOutput('')
+		} else {
+			setInput(input + value)
+		}
+	}
 
-	const teste = useCallback(
-		(event) => {
-			event.preventDefault()
-			set(ref(database, 'calculadora/senhas'), {
-				chat: {
-					asaf: '2004+2007',
-					luisa: '2007+2004'
-				}
-			}).then(() => console.log('foi'))
-		},
-		[]
-	)
+	const buttons = [
+		['7', '8', '9', '/'],
+		['4', '5', '6', 'x'],
+		['1', '2', '3', '-'],
+		['C', '0', '=', '+'],
+	]
+
 	return (
-		<Center flex={1}>
-			<Text onPress={teste}>index</Text>
-		</Center>
+		<View style={styles.container}>
+			<View style={styles.display}>
+				<Text style={styles.input}>{input}</Text>
+				<Text style={styles.output}>{output}</Text>
+			</View>
+			<View style={styles.buttons}>
+				{buttons.map((row, rowIndex) => (
+					<View key={rowIndex} style={styles.row}>
+						{row.map((value) => (
+							<TouchableOpacity key={value} style={styles.button} onPress={() => handleButtonPress(value)}>
+								<Text style={styles.buttonText}>{value}</Text>
+							</TouchableOpacity>
+						))}
+					</View>
+				))}
+			</View>
+		</View>
 	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: 'flex-end',
+		backgroundColor: '#f2f2f2',
+	},
+	display: {
+		padding: 20,
+		alignItems: 'flex-end',
+	},
+	input: {
+		fontSize: 32,
+	},
+	output: {
+		fontSize: 24,
+		marginTop: 10,
+		color: '#666',
+	},
+	buttons: {
+		backgroundColor: '#fff',
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+	},
+	row: {
+		flexDirection: 'row',
+	},
+	button: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: 20,
+	},
+	buttonText: {
+		fontSize: 24,
+		color: 'black',
+	},
+})

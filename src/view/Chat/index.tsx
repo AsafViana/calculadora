@@ -3,10 +3,9 @@ import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
 import { Platform } from 'react-native'
 import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { set, ref, database, onValue, collection, firestore, setDoc, doc } from '../../service/firebaseConfig'
+import { set, ref, database, onValue, collection, firestore, query, onSnapshot, orderBy, addDoc } from '../../service/firebaseConfig'
 import { GiftedChat } from 'react-native-gifted-chat'
 import {Perfil} from '../../model'
-import { onSnapshot } from 'firebase/firestore'
 
 export default function index(props) {
 	const {} = props
@@ -15,28 +14,55 @@ export default function index(props) {
 	const navigation = useNavigation()
 	const [messages, setMessages] = useState([])
 
-	useLayoutEffect(() => {
+	const usuarios = [
+		{
+			_id: 1,
+			name: 'Gatão',
+			avatar: 'https://i.ibb.co/H7Wvchw/download.jpg',
+		},
+		{
+			_id: 2,
+			name: 'Princesa',
+			avatar: 'https://i.ibb.co/7gxNZzd/0987f8c37d654a2267833ca048b3e8ea.jpg',
+		},
+	]
 
-		onSnapshot(doc(firestore, 'chats'), doc => {
-			console.log(doc.data())
+	useLayoutEffect(() => {
+		const q = query(collection(firestore, 'chats'), orderBy('createdAt', 'desc'))
+
+		const unsubscribe = onSnapshot(q, snapshot => {
+			setMessages(
+				snapshot.docs.map(doc => ({
+					_id: doc.data()._id,
+					createdAt: doc.data().createdAt.toDate(),
+					text: doc.data().text,
+					user: doc.data().user
+				}))
+			)
 		})
+		return unsubscribe
 
 	}, [])
+
+	const addChat = async (_id, createdAt, text, user) => {
+		try {
+			const docRef = await addDoc(collection(firestore, 'chats'), { _id, createdAt, text, user })
+		} catch (e) {
+			console.error('Erro ao adicionar documento: ', e)
+		}
+	}
 
 	const onSend = useCallback((messages = []) => {
 		setMessages((previousMessages) => GiftedChat.append(previousMessages, messages))
 		const {
 			_id,
 			createdAt,
-			test,
+			text,
 			user
 		}=messages[0]
-		setDoc(doc(firestore,'chats'), {
-			_id,
-			createdAt,
-			test,
-			user,
-		})
+
+		addChat(_id, createdAt, text, user)
+
 	}, [])
 
 	return (
@@ -45,11 +71,7 @@ export default function index(props) {
 			onSend={(messages) => onSend(messages)}
 			showUserAvatar={true}
 			showAvatarForEveryMessage={true}
-			user={{
-				_id: 1,
-				avatar: 'https://i.ibb.co/H7Wvchw/download.jpg',
-				name: 'eu',
-			}}
+			user={usuarios[parametros.usuario]}
 		/>
 	)
 }

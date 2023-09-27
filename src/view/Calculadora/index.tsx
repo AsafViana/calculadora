@@ -1,10 +1,12 @@
-import { Center, Text, Box, Button, VStack, HStack } from 'native-base'
+import { Center, Text, Box, Button, VStack, HStack, Pressable, Stack } from 'native-base'
 import React, { useState, useEffect, useCallback } from 'react'
 import BotaoCalculadora from '../../component/BotaoCalculadora'
 import { AntDesign, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { onValue, ref, database } from '../../service/firebaseConfig'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { StyleSheet, View, TouchableOpacity } from 'react-native'
+
 
 export default function index(props) {
 	const {} = props
@@ -14,6 +16,13 @@ export default function index(props) {
 	const [SenhaAsaf, setSenhaAsaf] = useState()
 	const [SenhaLuisa, setSenhaLuisa] = useState()
 
+	const buttons = [
+		['7', '8', '9', '/'],
+		['4', '5', '6', 'x'],
+		['1', '2', '3', '-'],
+		['C', '0', '=', '+'],
+	]
+
 	const handle_onPress = (botao) => {
 		if (botao === 'C') {
 			setOperação('0')
@@ -22,9 +31,9 @@ export default function index(props) {
 			setOperação(Operação.slice(0, -1))
 		} else if (botao === '=') {
 			if (Operação === SenhaAsaf) {
-				navigation.navigate('Chat', { usuario: 'asaf' })
+				navigation.navigate('Chat', { usuario: 0 })
 			} else if (Operação === SenhaLuisa) {
-				navigation.navigate('Chat', { usuario: 'luisa' })
+				navigation.navigate('Chat', { usuario: 1 })
 			} else {
 				setResultado(eval(Operação))
 			}
@@ -48,8 +57,8 @@ export default function index(props) {
 	useEffect(get_dados, [SenhaAsaf, SenhaLuisa])
 
 	return (
-		<Box flex={1} background={'muted.900'} safeArea>
-			<VStack space={'2'} justifyContent={'flex-end'} alignItems={'flex-end'} px={18} h={'40'}>
+		<Box flex={1} background={'muted.900'} justifyContent={'flex-end'} safeArea>
+			<VStack space={'2'} pt={20} alignItems={'flex-end'} px={18} h={'40'}>
 				<Text color={'muted.50'} fontSize={30}>
 					{Operação}
 				</Text>
@@ -58,7 +67,21 @@ export default function index(props) {
 				</Text>
 			</VStack>
 
-			<VStack flex={1} space={'6'} justifyContent={'center'} alignContent={'center'}>
+			<Box flex={1} justifyContent={'flex-end'} pb={10}>
+				{buttons.map((row, rowIndex) => (
+					<Stack flexDirection={'row'} key={rowIndex}>
+						{row.map((value) => (
+							<Pressable key={value} w={20} h={20} borderRadius={'full'} backgroundColor={'muted.800'} flex={1} alignItems={'center'} m={1} justifyContent={'center'} onPress={() => handle_onPress(value)}>
+								<Text fontSize={'3xl'} color={'green.400'}>
+									{value}
+								</Text>
+							</Pressable>
+						))}
+					</Stack>
+				))}
+			</Box>
+
+			{/* <VStack flex={1} space={'6'} justifyContent={'center'} alignContent={'center'}>
 				<HStack space={'2'} justifyContent={'center'} alignContent={'center'}>
 					<BotaoCalculadora value="C" background="muted.800" color="error.600" onPress={() => handle_onPress('C')} />
 					<BotaoCalculadora background="muted.800" color="muted.50" icon={<Ionicons name="backspace-outline" size={30} color="#fafaf9" />} onPress={() => handle_onPress('bs')} />
@@ -98,7 +121,46 @@ export default function index(props) {
 
 					<BotaoCalculadora background="green.600" color="muted.50" icon={<FontAwesome5 name="equals" size={30} color="#fafaf9" />} onPress={() => handle_onPress('=')} />
 				</HStack>
-			</VStack>
+			</VStack> */}
 		</Box>
 	)
 }
+
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: 'flex-end',
+		backgroundColor: '#f2f2f2',
+	},
+	display: {
+		padding: 20,
+		alignItems: 'flex-end',
+	},
+	input: {
+		fontSize: 32,
+	},
+	output: {
+		fontSize: 24,
+		marginTop: 10,
+		color: '#666',
+	},
+	buttons: {
+		backgroundColor: '#fff',
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+	},
+	row: {
+		flexDirection: 'row',
+	},
+	button: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: 20,
+	},
+	buttonText: {
+		fontSize: 24,
+		color: 'black',
+	},
+})
