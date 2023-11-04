@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, Linking } from 'react-native'
 
 export default function App() {
 	const [input, setInput] = useState('')
 	const [output, setOutput] = useState('')
+
+	const WhatsApp = (text, phone) => {
+		Linking.openURL(`whatsapp://send?text=${text}&phone=${phone}`)
+	}
 
 	const handleButtonPress = (value) => {
 		if (value === '=') {
@@ -37,7 +41,7 @@ export default function App() {
 				{buttons.map((row, rowIndex) => (
 					<View key={rowIndex} style={styles.row}>
 						{row.map((value) => (
-							<TouchableOpacity key={value} style={styles.button} onPress={() => handleButtonPress(value)}>
+							<TouchableOpacity key={value} style={styles.button} onPress={() => WhatsApp('teste', '51981215342')}>
 								<Text style={styles.buttonText}>{value}</Text>
 							</TouchableOpacity>
 						))}
